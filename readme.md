@@ -4,20 +4,12 @@ PC fan controllers are expensive. Arduinos are cheap (the knockoff ones anyways)
 ## Background
 I bought a Dell prebuilt. The CPU fan gets set to max speed when the CPU is only at 45 degrees. It's REALLY loud. Apparently, this is a known issue with Dells. Unfortunately, because Dell is Dell there is no way to adjust the fan speeds either in the BIOS or even with third party software. I tried swapping out the fan with a quieter one, but it was still too loud. Alas, the only solution is the get a external fan controller. Or rather build my own because fan controllers are expensive.
 
-## Required Hardware/Tools
-- Arduino Uno R3 (or equivelant knockoff)
-- 4-pin PWM fan (3 pin fans not supported)
-- electronics wires
-- wire stripper (knife or scissors work fine)
-- soldering iron (or just twist the wires together)
-- electrical tape (regular tape should be fine too)
-- cardboard
-- hot glue (or more tape)
+## Installation
+See [Installation Guide](https://github.com/vExcess/UnoFanController/blob/main/installation-guide.md)
 
-## 4-pin PWM Fan Specs
+## 4-pin PWM Fan Specification
 Resource: [https://www.intel.com/content/dam/support/us/en/documents/intel-nuc/intel-4wire-pwm-fans-specs.pdf](https://www.intel.com/content/dam/support/us/en/documents/intel-nuc/intel-4wire-pwm-fans-specs.pdf)
 
-### TDLR
 Fan has 4 pins in order from left to right from the perspective of the connector notch being on the right:
 1) PWM Pin
     - Purpose: controls fan speed. Higher duty cycle = fan go faster
@@ -33,3 +25,8 @@ Fan has 4 pins in order from left to right from the perspective of the connector
     - Purpose: powers fan motor
 
 4) Ground Pin
+
+## GUI
+The GUI is located at [http://localhost:49942/](http://localhost:49942/)
+
+![gui screenshot](https://raw.githubusercontent.com/vExcess/UnoFanController/refs/heads/main/gui-screenshot.png)

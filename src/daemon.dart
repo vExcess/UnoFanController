@@ -45,22 +45,27 @@ String configString() {
     return "${portPath}\n${useCurve}\n${fanCurve.map((a) => a[1]).join(",")}\n${constantSetting}";
 }
 
-void saveConfig() {
+File getConfigFile() {
     File file;
     if (Platform.isLinux || Platform.isMacOS) {
-        file = File("${Platform.environment['HOME']}/.UnoFanController");
+        file = File("${Platform.environment['HOME']}/.UnoFanController/config.txt");
     } else {
         throw "eeeeeee";
     }
+    return file;
+}
+
+void saveConfig() {
+    var file = getConfigFile();
 
     if (!file.existsSync()) {
-        file.createSync();
+        file.createSync(recursive: true);
     }
     file.writeAsStringSync(configString());
 }
 
 void loadConfig() {
-    var file = File("~/.UnoFanController");
+    var file = getConfigFile();
 
     if (file.existsSync()) {
         final lines = file.readAsLinesSync();
