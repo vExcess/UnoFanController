@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>UnoFanController GUI</title>
+    
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            margin-left: 40px;
+            margin-right: 40px;
+        }
+        
+        .label {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        
+        .box {
+            background-color: rgb(250, 245, 250);
+            border: 2px solid rgb(200, 200, 200);
+            border-radius: 10px;
+            padding: 8px;
+            width: fit-content;
+        }
+        
+        .box canvas {
+            margin-top: 4px;
+            margin-bottom: -4px;
+            border-radius: 5px;
+        }
+        
+        #control {
+            border-radius: 10px;
+        }
+        
+        #controlPanel button {
+            transform: translate(428px, -296px);
+        }
+    </style>
+    
+    <script src="https://cdn.jsdelivr.net/gh/librepaint/drawlite@main/javascript/drawlite.js"></script>
+</head>
+<body>
+    
+    <div style="display: flex; justify-content: space-between;">
+        <div>
+            <div class="label">Sensor</div>
+            <div id="sensors"></div>
+            <br>
+            <div class="label">Fan</div>
+            <div id="fans"></div>
+        </div>
+        <div id="controlPanel" style="margin: auto; width: fit-content;">
+            <canvas id="control" width="700" height="300"></canvas>
+        </div>
+    </div>
+    
+    <script type>{
+var sensorsEl = document.getElementById("sensors");
+var fansEl = document.getElementById("fans");
+var controlCanvas = document.getElementById("control");
+
+const degC = String.fromCharCode(176) + "C";
+
+var latestVals = [0, 0, 0];
+
+class Sensor {
+    boxEl;
+    avgEl;
+    canvasEl;
+    
+    avgTemp = 50;
+    
+    avgHist = [];
+    
+    dl;
+    
+    constructor() {
+        this.boxEl = document.createElement("div");
+        this.boxEl.className = "box";
+        this.boxEl.innerHTML = `<strong>CPU</strong>`;
+        
+        this.avgEl = document.createElement("div");
+        this.avgEl.innerHTML = `<span style="color: red;">Temperature:</span> <span class="avgVal"></span> ${degC}`;
+        this.boxEl.append(this.avgEl);
+        
+        this.canvasEl = document.createElement("canvas");
+        this.canvasEl.width = 300;
+        this.canvasEl.height = 200;
+        this.boxEl.append(this.canvasEl);
+    
+        sensorsEl.append(this.boxEl);
+        
+        this.dl = Drawlite(this.canvasEl);
+        
+        this.render();
+    }
+    
+    update() {
+        this.avgTemp = latestVals[0];
+
+        var avgEl = this.avgEl.getElementsByClassName("avgVal")[0];
+        avgEl.innerText = Math.round(this.avgTemp);
+        
+        this.avgHist.push(this.avgTemp);
+        
+        this.render();
+    }
+    
+    render() {
+        var { background, translate, scale, noStroke, fill, ellipse, pushMatrix, rotate, stroke, strokeWeight, triangle, cos, sin, popMatrix, colorMode, HSB, beginShape, vertex, endShape, RGB, noFill, enableContextMenu, rectMode, CENTER, bezierVertex, arc, CORNER, rect } = this.dl;
+        
+        if (this.avgHist.length > 61) {
+            this.avgHist.splice(0, 1);
+        }
+        
+        background(230);
+        
+        strokeWeight(2);        
+        fill(200, 0, 0);
+        beginShape();
+        vertex(-1, 205);
+        for (var i = 0; i < this.avgHist.length; i++) {
+            vertex(i * 5 - 1, 200 - this.avgHist[i] * 2);
+        }
+        vertex((i-1) * 5, 201);
+        vertex(300, 201);
+        endShape();
+    }
+}
+
+class Fan {
+    boxEl;
+    pwmEl;
+    rpmEl;
+    canvasEl;
+    
+    pwm = 50;
+    rpm = 1000;
+    
+    pwmHist = [];
+    
+    dl;
+    
+    constructor() {
+        this.boxEl = document.createElement("div");
+        this.boxEl.className = "box";
+        this.boxEl.innerHTML = `<strong>CPU Fan</strong>`;
+        
+        this.pwmEl = document.createElement("div");
+        this.pwmEl.innerHTML = `<span style="color: blue;">PWM:</span> <span class="pwmVal"></span>%`;
+        this.boxEl.append(this.pwmEl);
+        
+        this.rpmEl = document.createElement("div");
+        this.rpmEl.innerHTML = `RPM: <span class="rpmVal"></span>`;
+        this.boxEl.append(this.rpmEl);
+        
+        this.canvasEl = document.createElement("canvas");
+        this.canvasEl.width = 300;
+        this.canvasEl.height = 200;
+        this.boxEl.append(this.canvasEl);
+    
+        fansEl.append(this.boxEl);
+        
+        this.dl = Drawlite(this.canvasEl);
+        
+        this.render();
+    }
+    
+    update() {
+        this.pwm = latestVals[1] * 100;
+        this.rpm = latestVals[2];
+        
+        var pwmEl = this.pwmEl.getElementsByClassName("pwmVal")[0];
+        pwmEl.innerText = Math.round(this.pwm);
+        
+        var rpmEl = this.rpmEl.getElementsByClassName("rpmVal")[0];
+        rpmEl.innerText = Math.round(this.rpm);
+        
+        this.pwmHist.push(this.pwm);
+        
+        this.render();
+    }
+    
+    render() {
+        var { background, translate, scale, noStroke, fill, ellipse, pushMatrix, rotate, stroke, strokeWeight, triangle, cos, sin, popMatrix, colorMode, HSB, beginShape, vertex, endShape, RGB, noFill, enableContextMenu, rectMode, CENTER, bezierVertex, arc, CORNER, rect } = this.dl;
+        
+        if (this.pwmHist.length > 61) {
+            this.pwmHist.splice(0, 1);
+        }
+        
+        background(230);
+
+        strokeWeight(2);
+        fill(0, 0, 200);
+        beginShape();
+        vertex(-1, 205);
+        for (var i = 0; i < this.pwmHist.length; i++) {
+            vertex(i * 5 - 1, 200 - this.pwmHist[i] * 2);
+        }
+        vertex((i-1) * 5, 201);
+        vertex(300, 201);
+        endShape();
+    }
+}
+
+var CURVE = 0, CONSTANT = 1;
+var controlMode = CURVE;
+
+var loadedConfig = false;
+var fanCurve = [
+    [0, 0.3], 
+    [20, 0.3], 
+    [40, 0.3], 
+    [60, 0.4], 
+    [70, 0.5], 
+    [80, 0.8],
+    [90, 0.9],
+    [100, 1.0],
+];
+var constantSetting = 0.3;
+var settingsChanged = false;
+
+function point_rect(px, py, rx, ry, rw, rh) {
+    return (px > rx && px < rx + rw && py > ry && py < ry + rh);
+}
+
+
+var controlDl = Drawlite(controlCanvas);
+function renderControlPanel() {
+    var { background, translate, scale, noStroke, fill, ellipse, pushMatrix, rotate, stroke, strokeWeight, triangle, cos, sin, popMatrix, colorMode, HSB, beginShape, vertex, endShape, RGB, noFill, enableContextMenu, rectMode, CENTER, bezierVertex, arc, CORNER, rect, textAlign, CENTER, text, textSize, get, BASELINE, line, size, RIGHT, dist, map } = controlDl;
+    
+    var canvasRect = controlDl.canvas.getBoundingClientRect();
+    var mouseX = get.mouseX - canvasRect.left;
+    var mouseY = get.mouseY - canvasRect.top;
+    
+    // do resize before render to prevent flickering
+    if (controlMode === CURVE && controlCanvas.height !== 600) {
+        size(controlCanvas.width, 600);
+    } else if (controlMode === CONSTANT && controlCanvas.height !== 200) {
+        size(controlCanvas.width, 200);
+    }
+    
+    background(0);
+    
+    if (controlMode === CURVE) {
+        fill(255);
+        textAlign(BASELINE);
+        textSize(22);
+        text("Curve Control", 12, 32);
+        
+        strokeWeight(1);
+        stroke(255);
+        noFill();
+        rect(100, 100, 500, 400);
+        
+        fill(255);
+        textSize(18);
+        textAlign(CENTER);
+        for (var i = 0; i <= 5; i++) {
+            var x = 100 + i * 500 / 5;
+            line(x, 100, x, 500);
+            text((i * 20) + degC, x, 530);
+        }
+        
+        textAlign(RIGHT);
+        for (var i = 1; i <= 5; i++) {
+            var y = 500 - i * 400 / 5;
+            line(100, y, 600, y);
+            text((i * 20) + "%", 90, 14 + y);
+        }
+        
+        strokeWeight(3);
+        stroke(255);
+        for (var i = 0; i < fanCurve.length-1; i++) {
+            var x = 100 + fanCurve[i][0] / 100 * 500;
+            var y = 500 - fanCurve[i][1] * 400;
+            var x2 = 100 + fanCurve[i+1][0] / 100 * 500;
+            var y2 = 500 - fanCurve[i+1][1] * 400;
+            line(x, y, x2, y2);
+        }
+        
+        noFill();
+        colorMode(HSB);
+        for (var i = 0; i < fanCurve.length; i++) {
+            stroke(150 - i * (150 / fanCurve.length), 255, 255);
+            var x = 100 + fanCurve[i][0] / 100 * 500;
+            var y = 500 - fanCurve[i][1] * 400;
+            ellipse(x, y, 12, 12);
+        }
+        colorMode(RGB);
+        
+        if (get.mouseIsPressed && point_rect(mouseX, mouseY, 100, 100, 500, 400)) {
+            for (var i = 0; i < fanCurve.length; i++) {
+                var px, x, nx, ll, rl;
+                if (i === 0) {
+                    x = 100 + fanCurve[i][0] / 100 * 500;
+                    nx = 100 + fanCurve[i+1][0] / 100 * 500;
+                    ll = 100;
+                    rl = (nx + x) / 2;
+                } else if (i === fanCurve.length-1) {
+                    px = 100 + fanCurve[i-1][0] / 100 * 500;
+                    x = 100 + fanCurve[i][0] / 100 * 500;
+                    ll = (px + x) / 2;
+                    rl = 600;
+                } else {
+                    px = 100 + fanCurve[i-1][0] / 100 * 500;
+                    x = 100 + fanCurve[i][0] / 100 * 500;
+                    nx = 100 + fanCurve[i+1][0] / 100 * 500;
+                    ll = (px + x) / 2;
+                    rl = (nx + x) / 2;
+                }
+                if (mouseX > ll && mouseX < rl) {
+                    fanCurve[i][1] = Math.round(map(mouseY, 100, 500, 1, 0) * 20) / 20;
+                    settingsChanged = true;
+                }
+            }
+        }
+    } else if (controlMode === CONSTANT) {
+        fill(255);
+        textAlign(BASELINE);
+        textSize(22);
+        text("Constant Speed", 12, 32);
+        
+        textAlign(CENTER);
+        textSize(20);
+        text(Math.round(constantSetting * 100) + "%", 350, 80);
+        
+        textSize(18);
+        for (var i = 0; i <= 5; i++) {
+            text((i * 20) + "%", 100 + i * 500 / 5, 160);    
+        }
+        
+        stroke(255);
+        noFill();
+        rect(100, 100, 500, 30);
+        
+        fill(220, 200, 220);
+        rect(100, 100, constantSetting * 500, 30);
+        
+        fill(255);
+        rect(100 + constantSetting * 500 - 5, 90, 10, 50, 20);
+        
+        if (get.mouseIsPressed && point_rect(mouseX, mouseY, 100, 100, 500, 30)) {
+            constantSetting = Math.round((mouseX - 100) / 500 * 20) / 20;
+            settingsChanged = true;
+        }
+    }
+    
+    fill(170);
+    stroke(210);
+    if (point_rect(mouseX, mouseY, 382, 10, 150, 32)) {
+        fill(255);
+    }
+    rect(382, 10, 150, 32, 5);
+
+    fill(170);
+    stroke(210);
+    if (point_rect(mouseX, mouseY, 382 + 150 + 10, 10, 150, 32)) {
+        fill(255);
+    }
+    rect(382 + 150 + 10, 10, 150, 32, 5);
+    
+    textSize(18);
+    textAlign(CENTER);
+    fill(0);
+    text("Curve Control", 456, 32);
+    text("Constant Speed", 456 + 150 + 10, 32);
+}
+
+
+var cpu = new Sensor();
+var fan = new Fan();
+
+var lastUpdate = 0;
+controlDl.draw = function() {
+    if (Date.now() - lastUpdate >= 1000) {
+        fetch("/poll").then(res => res.text()).then(txt => {
+            var lines = txt.split("\n");
+            latestVals = lines[0].split(",").map(Number);
+            cpu.update();
+            fan.update();
+
+            if (!loadedConfig) {
+                // portPath = lines[1];
+
+                if (lines[2] === "true") {
+                    controlMode = CURVE;
+                } else {
+                    controlMode = CONSTANT;
+                }
+                
+                var curveVals = lines[3].split(",");
+                for (var i = 0; i < curveVals.length; i++) {
+                    fanCurve[i][1] = Number(curveVals[i]);
+                }
+
+                constantSetting = Number(lines[4]);
+                
+                loadedConfig = true;
+            }
+        });
+
+        if (settingsChanged) {
+            fetch(`/set?arg=${controlMode === CURVE ? fanCurve.map(a => a[1]).join(",") : constantSetting}`);
+            settingsChanged = false;
+        }
+        
+        lastUpdate = Date.now();
+    }
+    
+    renderControlPanel();
+};
+
+controlDl.mouseReleased = function() {
+    var { get } = controlDl;
+    var canvasRect = controlDl.canvas.getBoundingClientRect();
+    var mouseX = get.mouseX - canvasRect.left;
+    var mouseY = get.mouseY - canvasRect.top;
+
+    if (get.mouseIsPressed && point_rect(mouseX, mouseY, 382, 10, 150, 32)) {
+        controlMode = CURVE;
+        settingsChanged = true;
+    } else if (get.mouseIsPressed && point_rect(mouseX, mouseY, 382 + 150 + 10, 10, 150, 32)) {
+        controlMode = CONSTANT;
+        settingsChanged = true;
+    }
+};
+
+    }</script>
+
+</body>
+</html>

@@ -1,0 +1,49 @@
+BLE = Bluetooth Low Energy
+IOT = Internet Of Things
+EEPROM = Flash memory that has higher durability and lets you write to individual bytes
+
+
+
+ATmega328P (few more instructions than ATmega328; requires different bootloader)
+    Bits: 8
+    MHz: 16 
+    EEPROM: 1 KB (100K writes)
+    SRAM: 2 KB
+
+ATmega328 (few less instructions than ATmega328P; requires different bootloader)
+    Bits: 8
+    MHz: 16 
+    EEPROM: 1 KB (100K writes)
+    SRAM: 2 KB
+
+ATmega16U2 (8-bit AVR microcontroller)
+    MHz: 16 
+    EEPROM: 512 bytes (100K writes)
+    SRAM: 512 bytes
+    Flash: 16 KB (10K writes)
+
+
+
+Arduino Uno R3 | Elegoo Uno R3
+    CPU: ATmega328P
+    USB Controller: ATmega16U2
+    Flash: 32 KB (10K writes)
+    Digital I/O Pins: 14
+    PWM Digital I/O Pins: 6
+    Analog Input Pins: 6
+
+Arduino Nano
+    CPU: ATmega328
+    USB Controller: FT232RL
+    Flash: 32 KB (10K writes)
+    Digital I/O Pins: 22
+    PWM Digital I/O Pins: 6
+    Analog Input Pins: 8
+
+Elegoo Nano V3.0
+    CPU: ATmega328
+    USB Controller: CH340
+    Flash: 32 KB (10K writes)
+    Digital I/O Pins: 22
+    PWM Digital I/O Pins: 6
+    Analog Input Pins: 8
