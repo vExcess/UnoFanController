@@ -1,3 +1,4 @@
+# on linux build and install from source
 git clone git://sigrok.org/libserialport
 cd libserialport/
 ./autogen.sh

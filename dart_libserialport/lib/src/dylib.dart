@@ -22,12 +22,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'dart:io';
 import 'dart:ffi' as ffi;
 
 import 'package:libserialport/src/bindings.dart';
 
 LibSerialPort? dylib_;
 LibSerialPort get dylib {
-    dylib_ ??= LibSerialPort(ffi.DynamicLibrary.open("/usr/local/lib/libserialport.so"));
+    if (Platform.isLinux) {
+        dylib_ ??= LibSerialPort(ffi.DynamicLibrary.open("/usr/local/lib/libserialport.so"));
+    } else {
+        throw "libserialport only supports Linux. use serial_port_win32 instead";
+    }
     return dylib_!;
 }

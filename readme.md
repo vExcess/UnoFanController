@@ -30,3 +30,8 @@ Fan has 4 pins in order from left to right from the perspective of the connector
 The GUI is located at [http://localhost:49942/](http://localhost:49942/)
 
 ![gui screenshot](https://raw.githubusercontent.com/vExcess/UnoFanController/refs/heads/main/gui-screenshot.png)
+
+## Platform Support
+Linux - Full Support  
+Windows - Partial Support (only constant fan speed is supported; no curve controlled fan speed)  
+Mac - No

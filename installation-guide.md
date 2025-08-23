@@ -18,7 +18,18 @@ Wire up your Arduino as shown in the image. Open up the `UnoFanController.ino` f
 ![wiring diagram](https://raw.githubusercontent.com/vExcess/UnoFanController/refs/heads/main/wiring-diagram.png)
 
 ## Daemon
-The daemon is the part that runs on your computer. It monitor's the CPU's temperature, calculates the desired fan speed, and sends the fan speed to the Arduino.
+The daemon is the part that runs on your computer. It monitors the CPU's temperature, calculates the desired fan speed, and sends the fan speed to the Arduino.
+
+On Linux you will need to download and install libserialport:
+```sh
+git clone git://sigrok.org/libserialport
+cd libserialport/
+./autogen.sh
+./configure
+make
+sudo make install
+```
+If you are using Windows, then serial_port_win32 is used instead which doesn't need to be seperately installed.
 
 Run `dart compile exe src/daemon.dart` to compile the daemon. A `daemon.exe` file will be created which you run the background to control the Arduino.
 
